@@ -2230,11 +2230,22 @@ class KubeSpawner(Spawner):
                     for s in self.pod_connect_ip.split(".")
                 ]
             )
+        # extract port from pod manifest
+        port_str = pod["metadata"]["annotations"].get("hub.jupyter.org/port")
+        if port_str:
+            port = int(port_str)
+        else:
+            # this should only happen on upgrade from kubespawner <7.1,
+            # but shouldn't error
+            self.log.warning(
+                f"Pod {pod['metadata']['name']} missing annotation 'hub.jupyter.org/port'"
+            )
+            port = self.port
 
         return "{}://{}:{}".format(
             proto,
             hostname,
-            self.port,
+            port,
         )
 
     async def get_pod_manifest(self):
@@ -2285,6 +2296,7 @@ class KubeSpawner(Spawner):
         annotations = self._build_common_annotations(
             self._expand_all(self.extra_annotations)
         )
+        annotations["hub.jupyter.org/port"] = str(self.port)
 
         return make_pod(
             name=self.pod_name,

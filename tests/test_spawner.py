@@ -1853,6 +1853,18 @@ async def test_url_changed(kube_ns, kube_client, config, hub_pod, hub):
     await spawner.poll()
     assert spawner.db.commit.call_count == previous_commit_count
 
+    # changing spawner.port (e.g. updated config while pod is running)
+    # should _not_ indicate changed url of running pod
+    spawner.port = 1234
+    await spawner.poll()
+    ref_key = f"{spawner.namespace}/{spawner.pod_name}"
+    pod = spawner.pod_reflector.pods.get(ref_key, None)
+    assert pod["metadata"]["annotations"]["hub.jupyter.org/port"] == "8888"
+    url = spawner._get_pod_url(pod)
+    assert url == pod_host
+    # didn't commit to the db
+    assert spawner.db.commit.call_count == previous_commit_count
+
     await spawner.stop()
 
 
@@ -1917,7 +1929,15 @@ async def test_ipv6_addr():
     spawner = KubeSpawner(
         _mock=True,
     )
-    url = spawner._get_pod_url({"status": {"podIP": "cafe:f00d::"}})
+    url = spawner._get_pod_url(
+        {
+            "metadata": {
+                "annotations": {},
+                "name": "jupyter-test",
+            },
+            "status": {"podIP": "cafe:f00d::"},
+        }
+    )
     assert "[" in url and "]" in url
 
 
