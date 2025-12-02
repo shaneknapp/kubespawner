@@ -1896,7 +1896,7 @@ class KubeSpawner(Spawner):
         """,
     )
 
-    server_spawn_launch_timer_threshold = Integer(
+    slow_spawn_message_threshold = Integer(
         60,
         config=True,
         help="""
@@ -1905,7 +1905,7 @@ class KubeSpawner(Spawner):
         """,
     )
 
-    server_spawn_launch_timer_frequency = Integer(
+    slow_spawn_message_frequency = Integer(
         5,
         config=True,
         help="""
@@ -1914,7 +1914,7 @@ class KubeSpawner(Spawner):
         """,
     )
 
-    server_spawn_launch_timer_message = Unicode(
+    slow_spawn_message = Unicode(
         "Server launch is taking longer than expected. Please be patient! Current time spent waiting: {seconds} seconds.",
         config=True,
         help="""
@@ -2724,13 +2724,13 @@ class KubeSpawner(Spawner):
             # if the timer is greater than self.server_spawn_launch_timer_threshold
             # display a message to the user with an incrementing count in seconds
             if (
-                timer >= self.server_spawn_launch_timer_threshold
-                and self.server_spawn_launch_timer_threshold > 0
+                timer >= self.slow_spawn_message_threshold
+                and self.slow_spawn_message_threshold > 0
             ):
                 # don't spam the user, so only update the timer message every few seconds
-                if timer % self.server_spawn_launch_timer_frequency == 0:
+                if timer % self.slow_spawn_message_frequency == 0:
                     patience_message = textwrap.dedent(
-                        self.server_spawn_launch_timer_message
+                        self.slow_spawn_message
                     )
                     patience_message = patience_message.format(seconds=timer)
 
