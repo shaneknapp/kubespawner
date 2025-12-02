@@ -12,6 +12,7 @@ import os
 import re
 import string
 import sys
+import time
 import textwrap
 import warnings
 from functools import partial
@@ -2703,7 +2704,7 @@ class KubeSpawner(Spawner):
         next_event = 0
 
         # count in seconds to time single user server spawn duration
-        timer = 0
+        start_time = time.perf_counter()
 
         break_while_loop = False
         while True:
@@ -2723,15 +2724,17 @@ class KubeSpawner(Spawner):
 
             # if the timer is greater than self.server_spawn_launch_timer_threshold
             # display a message to the user with an incrementing count in seconds
+            elapsed = time.perf_counter() - start_time
             if (
-                timer >= self.slow_spawn_message_threshold
+                elapsed >= self.slow_spawn_message_threshold
                 and self.slow_spawn_message_threshold > 0
             ):
                 # don't spam the user, so only update the timer message every few seconds
-                if timer % self.slow_spawn_message_frequency == 0:
-                    patience_message = textwrap.dedent(self.slow_spawn_message)
-                    patience_message = patience_message.format(seconds=timer)
-
+                if elapsed % self.slow_spawn_message_frequency == 0:
+                    patience_message = textwrap.dedent(
+                        self.slow_spawn_message
+                    )
+                    patience_message = patience_message.format(seconds=int(elapsed))
                     yield {
                         'message': patience_message,
                     }
