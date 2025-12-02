@@ -2702,7 +2702,7 @@ class KubeSpawner(Spawner):
         progress = 0
         next_event = 0
 
-        # count in seconds to time single user server spawn duration
+        # timers for deciding when to show slow spawn patience message
         start_time = time.perf_counter()
         last_message_time = float()
 
