@@ -2730,7 +2730,7 @@ class KubeSpawner(Spawner):
                 and self.slow_spawn_message_threshold > 0
             ):
                 # don't spam the user, so only update the timer message every few seconds
-                if elapsed > last_message_time + self.slow_spawn_message_frequency:
+                if elapsed >= last_message_time + self.slow_spawn_message_frequency:
                     patience_message = textwrap.dedent(self.slow_spawn_message)
                     patience_message = patience_message.format(seconds=int(elapsed))
                     last_message_time = elapsed
