@@ -1896,20 +1896,12 @@ class KubeSpawner(Spawner):
         """,
     )
 
-    server_spawn_launch_timer_enabled = Bool(
-        True,
-        config=True,
-        help="""
-        Enable the spawn progress counter message.
-        """,
-    )
-
     server_spawn_launch_timer_threshold = Integer(
         60,
         config=True,
         help="""
         Time in seconds to wait before injecting a 'please be patient' message
-        to display to the user.
+        to display to the user. If this value is 0, no message will be shown.
         """,
     )
 
@@ -2733,7 +2725,7 @@ class KubeSpawner(Spawner):
             # display a message to the user with an incrementing count in seconds
             if (
                 timer >= self.server_spawn_launch_timer_threshold
-                and self.server_spawn_launch_timer_enabled
+                and self.server_spawn_launch_timer_threshold > 0
             ):
                 # don't spam the user, so only update the timer message every few seconds
                 if timer % self.server_spawn_launch_timer_frequency == 0:
