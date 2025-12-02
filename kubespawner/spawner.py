@@ -2704,6 +2704,7 @@ class KubeSpawner(Spawner):
 
         # count in seconds to time single user server spawn duration
         start_time = time.perf_counter()
+        last_message_time = float()
 
         break_while_loop = False
         while True:
@@ -2729,9 +2730,10 @@ class KubeSpawner(Spawner):
                 and self.slow_spawn_message_threshold > 0
             ):
                 # don't spam the user, so only update the timer message every few seconds
-                if elapsed % self.slow_spawn_message_frequency == 0:
+                if elapsed > last_message_time + self.slow_spawn_message_frequency:
                     patience_message = textwrap.dedent(self.slow_spawn_message)
                     patience_message = patience_message.format(seconds=int(elapsed))
+                    last_message_time = elapsed
                     yield {
                         'message': patience_message,
                     }
