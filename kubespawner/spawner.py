@@ -1920,8 +1920,7 @@ class KubeSpawner(Spawner):
         config=True,
         help="""
         The injected timing message to display to the user. The variable `{seconds}`
-        will be replaced by the number of seconds the spawn has taken in
-        self.progress().
+        will be replaced by the number of seconds the spawn has currently taken.
         """,
     )
 
