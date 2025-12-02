@@ -12,8 +12,8 @@ import os
 import re
 import string
 import sys
-import time
 import textwrap
+import time
 import warnings
 from functools import partial
 from typing import Optional, Tuple, Type
@@ -2731,9 +2731,7 @@ class KubeSpawner(Spawner):
             ):
                 # don't spam the user, so only update the timer message every few seconds
                 if elapsed % self.slow_spawn_message_frequency == 0:
-                    patience_message = textwrap.dedent(
-                        self.slow_spawn_message
-                    )
+                    patience_message = textwrap.dedent(self.slow_spawn_message)
                     patience_message = patience_message.format(seconds=int(elapsed))
                     yield {
                         'message': patience_message,
