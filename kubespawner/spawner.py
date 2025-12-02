@@ -1923,10 +1923,10 @@ class KubeSpawner(Spawner):
     )
 
     server_spawn_launch_timer_message = Unicode(
-        "Server launch is taking longer than expected. Please be patient! Current time spent waiting: XXX seconds.",
+        "Server launch is taking longer than expected. Please be patient! Current time spent waiting: {seconds} seconds.",
         config=True,
         help="""
-        The injected timing message to display to the user. The string XXX
+        The injected timing message to display to the user. The variable {seconds}
         will be replaced by the number of seconds the spawn has taken in
         self.progress().
         """,
@@ -2740,7 +2740,7 @@ class KubeSpawner(Spawner):
                     patience_message = textwrap.dedent(
                         self.server_spawn_launch_timer_message
                     )
-                    patience_message.replace('XXX', str(timer))
+                    patience_message = patience_message.format(seconds=timer)
 
                     yield {
                         'message': patience_message,
