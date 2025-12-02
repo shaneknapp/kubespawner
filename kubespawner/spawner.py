@@ -2704,7 +2704,7 @@ class KubeSpawner(Spawner):
 
         # timers for deciding when to show slow spawn patience message
         start_time = time.perf_counter()
-        last_message_time = start_time
+        last_message_time = 0
 
         break_while_loop = False
         while True:
