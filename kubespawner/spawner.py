@@ -1919,7 +1919,7 @@ class KubeSpawner(Spawner):
         "Server launch is taking longer than expected. Please be patient! Current time spent waiting: {seconds} seconds.",
         config=True,
         help="""
-        The injected timing message to display to the user. The variable {seconds}
+        The injected timing message to display to the user. The variable `{seconds}`
         will be replaced by the number of seconds the spawn has taken in
         self.progress().
         """,
