@@ -1798,7 +1798,7 @@ async def test_variable_expansion(ssl_app):
         "pod": await spawner.get_pod_manifest(),
         "pvc": spawner.get_pvc_manifest(),
         "secret": spawner.get_secret_manifest("dummy-owner-ref"),
-        "service": spawner.get_service_manifest("dummy-owner-ref"),
+        "service": spawner.get_service_manifest("dummy-owner-ref", 8888),
     }
 
     for resource_kind, manifest in manifests.items():
@@ -1859,7 +1859,7 @@ async def test_url_changed(kube_ns, kube_client, config, hub_pod, hub):
     await spawner.poll()
     ref_key = f"{spawner.namespace}/{spawner.pod_name}"
     pod = spawner.pod_reflector.pods.get(ref_key, None)
-    assert pod["metadata"]["annotations"]["hub.jupyter.org/port"] == "8888"
+    assert spawner._get_pod_port(pod) == 8888
     url = spawner._get_pod_url(pod)
     assert url == pod_host
     # didn't commit to the db
