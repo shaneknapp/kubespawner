@@ -1932,8 +1932,15 @@ async def test_ipv6_addr():
     url = spawner._get_pod_url(
         {
             "metadata": {
-                "annotations": {},
                 "name": "jupyter-test",
+            },
+            "spec": {
+                "containers": [
+                    {
+                        "name": "notebook",
+                        "ports": [{"name": "notebook-port", "containerPort": 8888}],
+                    }
+                ]
             },
             "status": {"podIP": "cafe:f00d::"},
         }
