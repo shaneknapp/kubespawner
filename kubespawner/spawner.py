@@ -2230,6 +2230,19 @@ class KubeSpawner(Spawner):
         """,
     )
 
+    def _get_pod_port(self, pod):
+        """
+        Return the port of the server in the pod.
+
+        That port must be called 'notebook-port'.
+        """
+        for container in pod["spec"]["containers"]:
+            for port in container["ports"]:
+                if port.get("name") == "notebook-port":
+                    return port["containerPort"]
+        pod_name = pod["metadata"]["name"]
+        raise KeyError(f"No port 'notebook-port' in pod {pod_name}")
+
     def _get_pod_url(self, pod):
         """Return the pod url
 
@@ -2260,10 +2273,12 @@ class KubeSpawner(Spawner):
                 ]
             )
 
+        port = self._get_pod_port(pod)
+
         return "{}://{}:{}".format(
             proto,
             hostname,
-            self.port,
+            port,
         )
 
     async def get_pod_manifest(self):
@@ -2400,7 +2415,7 @@ class KubeSpawner(Spawner):
             annotations=annotations,
         )
 
-    def get_service_manifest(self, owner_reference):
+    def get_service_manifest(self, owner_reference, port):
         """
         Make a service manifest for dns.
         """
@@ -2414,7 +2429,7 @@ class KubeSpawner(Spawner):
         # TODO: validate that the service name
         return make_service(
             name=self.pod_name,
-            port=self.port,
+            port=port,
             selector=selector,
             owner_references=[owner_reference],
             labels=labels,
@@ -3248,7 +3263,9 @@ class KubeSpawner(Spawner):
                     )
 
                 if self.internal_ssl or self.services_enabled:
-                    service_manifest = self.get_service_manifest(owner_reference)
+                    service_manifest = self.get_service_manifest(
+                        owner_reference, self._get_pod_port(pod)
+                    )
                     await exponential_backoff(
                         partial(
                             self._ensure_not_exists,
